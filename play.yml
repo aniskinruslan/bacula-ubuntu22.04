@@ -35,7 +35,7 @@
     - name: Create bacula DB User
       mysql_user:
         name: bacula
-        password: jnlnjdnj4l33r4934i
+        password: password
         login_user: root
         login_password: "root123"
         priv: '*.*:ALL'
@@ -106,7 +106,7 @@
         deb: http://launchpadlibrarian.net/474574250/bacula-director-mysql_9.4.2-2ubuntu5_all.deb
 
 
-    - name: Copying the Directory and its contents 
+    - name: Copying the Directory with configuration files 
       copy:
         src: //bacula-configs/ #make path changes
         dest: /etc/
