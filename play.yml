@@ -1,0 +1,117 @@
+- name: Bacula-valdation
+  hosts: all
+  become: true
+  
+  tasks:
+    - name: Installing MySQL
+      apt:
+        name:
+          - python3-pymysql
+          - mysql-server
+        state: latest
+        update_cache: yes
+
+    - name: Update mysql root password for all root accounts  
+      mysql_user:  
+         name: root  
+         host: "localhost"  
+         password: "root123"  
+         login_user: root  
+         login_password: "root123"  
+         check_implicit_admin: yes  
+         priv: "*.*:ALL,GRANT"  
+      with_items:  
+       - "{{ ansible_hostname }}" 
+       - localhost
+
+    - name: Creating bacula database
+      mysql_db:
+         check_implicit_admin: yes
+         login_user: root
+         login_password: "root123"
+         name: bacula
+         state: present
+
+    - name: Create bacula DB User
+      mysql_user:
+        name: bacula
+        password: jnlnjdnj4l33r4934i
+        login_user: root
+        login_password: "root123"
+        priv: '*.*:ALL'
+        state: present 
+
+    # - name: Uncoment 44-48 and 74 lines if you have to install libssl1
+    #   shell: "echo 'deb http://security.ubuntu.com/ubuntu focal-security main' | sudo tee /etc/apt/sources.list.d/focal-security.list"
+        
+    # - name: update cache  
+    #   shell: "apt update"  
+
+    - name: Installing dependences
+      apt:
+        name:
+          - dbconfig-common 
+          - dbconfig-mysql
+          - default-mysql-client
+          - default-mysql-server
+          - galera-4
+          - gawk
+          - libaio1
+          - libcgi-fast-perl
+          - libcgi-pm-perl
+          - libconfig-inifiles-perl
+          - libdbi-perl
+          - libfcgi-bin
+          - libfcgi-perl
+          - libfcgi0ldbl
+          - libhtml-template-perl
+          - libmariadb3
+          - libsigsegv2
+          - libterm-readkey-perl
+          - mysql-common
+          - rsync
+          - socat
+#          - libssl1.1 #Uncoment + 44-48 lines to install
+
+    - name: Installing Bacula common
+      apt:
+        deb: http://launchpadlibrarian.net/474574266/bacula-common_9.4.2-2ubuntu5_amd64.deb
+            
+    - name: Installing Bacula common mysql
+      apt:       
+        deb: http://launchpadlibrarian.net/474574262/bacula-common-mysql_9.4.2-2ubuntu5_amd64.deb
+        
+    - name: Installing Bacula-console
+      apt:        
+        deb: http://launchpadlibrarian.net/474574268/bacula-console_9.4.2-2ubuntu5_amd64.deb
+    
+    - name: Installing Bacula fd
+      apt:        
+        deb: http://launchpadlibrarian.net/474574270/bacula-fd_9.4.2-2ubuntu5_amd64.deb
+    
+    - name: Installing Bacula sd
+      apt:        
+        deb: http://launchpadlibrarian.net/474574271/bacula-sd_9.4.2-2ubuntu5_amd64.deb
+        
+    - name: Installing Bacula tray monitor
+      apt:        
+        deb: http://launchpadlibrarian.net/474574272/bacula-tray-monitor_9.4.2-2ubuntu5_amd64.deb
+        
+    - name: Installing Bacula dicrector
+      apt:        
+        deb: http://launchpadlibrarian.net/474574269/bacula-director_9.4.2-2ubuntu5_amd64.deb
+
+    - name: Installing Bacula director mssql
+      apt:        
+        deb: http://launchpadlibrarian.net/474574250/bacula-director-mysql_9.4.2-2ubuntu5_all.deb
+
+
+    - name: Copying the Directory and its contents 
+      copy:
+        src: //bacula-configs/ #make path changes
+        dest: /etc/
+        owner: root
+        group: root       
+        mode: 0644
+
+    
